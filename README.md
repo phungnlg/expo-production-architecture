@@ -3,8 +3,13 @@
 A reference **React Native + Expo** app that demonstrates how I structure a
 production-grade mobile codebase: clean layering, typed data flow, real
 loading/empty/error states, an auth gate, and unit-tested business logic. The
-feature itself (a small team task manager) is deliberately simple, the point is
+feature itself (a small team task manager) is deliberately simple. The point is
 the **architecture around it**.
+
+> Scope: this is an architecture skeleton, not a shipped product. It shows how
+> the layers fit together. Operational concerns a real release needs (error
+> reporting, analytics, CI/CD, OTA updates, offline persistence, a11y pass) are
+> called out under **Decisions & tradeoffs**, not implemented here.
 
 Stack: **Expo Router** (typed file-based routes) · **TypeScript** (strict) ·
 **Zustand** (client state) · **React Query** (server state) · a typed
@@ -97,14 +102,84 @@ flowchart LR
     Mapper -->|domain Task| Screen
 ```
 
-### Why this scales
+Write path - mutation, then cache invalidation drives the refetch:
+
+```mermaid
+flowchart LR
+    Form["New task form"]
+    Mutation["useCreateTask()<br/><i>React Query mutation</i>"]
+    Api["TasksApi.create"]
+    Cache["queryClient<br/><i>invalidate tasks key</i>"]
+    List["useTasks()<br/><i>refetch -> re-render</i>"]
+
+    Form -->|submit| Mutation
+    Mutation -->|HTTP| Api
+    Mutation -->|onSuccess| Cache
+    Cache -->|stale| List
+```
+
+Current write strategy is invalidate-on-success (server is source of truth for
+ordering), not optimistic update. Optimistic writes would be a per-mutation
+`onMutate`/rollback addition - intentionally left out to keep the path obvious.
+
+### Why this stays maintainable
 
 - A new feature is a new folder under `features/` + a route file. Nothing
   existing changes.
-- Swapping the mock backend for the real API is **one line** in `services.ts`
-  (drop `createMockFetch()`, point `baseUrl` at the server). No screen edits.
+- Swapping the mock backend for the real API is a **small, contained change** in
+  `services.ts` (drop `createMockFetch()`, point `baseUrl` at the server). No
+  screen edits. A real API also brings token refresh, pagination and error
+  envelopes - those land in the API layer, still not in screens.
 - Cross-cutting concerns (auth header, retry, error copy) each live in exactly
   one file, so they are changed once, not hunted across screens.
+
+These patterns are the parts that hurt at scale in real apps. The 5-screen
+feature here is just enough to exercise them, not a proof of scale on its own.
+
+## Decisions & tradeoffs
+
+- **Zustand over Redux Toolkit** - client/session state here is small (token,
+  user, UI flags). Zustand gives a persisted store with selectors and no
+  boilerplate. RTK earns its weight when you need middleware, devtools-driven
+  debugging or a large normalized cache - not the case at this size.
+- **React Query over RTK Query** - kept the server-state library independent of
+  the client-state choice. React Query's cache/invalidate/refetch model is the
+  point of the read and write diagrams above; pairing it with Zustand keeps the
+  two state kinds visibly separate.
+- **Mock backend over MSW** - `mockBackend.ts` is `fetch`-compatible and wired
+  at the composition root, so the app runs with zero setup and the swap to a
+  real server is one file. MSW would be the choice once there are request
+  fixtures worth sharing between the app and tests.
+- **`Result<T, AppError>` over throwing** - errors cross the API boundary as
+  data, so the UI handles one `AppError` shape. The unwrap-at-the-hook adapter
+  keeps React Query's throw-based contract without leaking throws into screens.
+
+### Auth token lifecycle
+
+Token + user persist to **AsyncStorage** (`zustand/persist`), rehydrated on boot
+and gated by a `hydrated` flag so the splash redirect waits for storage. The
+`ApiClient` reads the token via a non-React getter, so the network layer stays
+decoupled from React.
+
+Not implemented (would be needed for production): **token stored in
+`expo-secure-store`** rather than AsyncStorage, refresh-token rotation, and 401 ->
+refresh -> retry in the client. The single auth-header chokepoint is where that
+logic would attach.
+
+### What's tested, what isn't
+
+Unit-tested (Jest, no UI/network): DTO mappers, task sorting, and the client
+retry/backoff policy - the pure logic most likely to regress silently. Not
+covered here: component tests (React Native Testing Library) and E2E
+(Maestro/Detox). The layering keeps logic testable without a UI; adding those
+layers is additive, not a rewrite.
+
+### Out of scope (intentionally)
+
+Error reporting (Sentry), analytics, env/secret config beyond `EXPO_PUBLIC_*`,
+CI/CD, EAS OTA updates, list virtualization/perf tuning, offline cache
+persistence, and a full a11y pass. Each has a natural home in this structure -
+left out to keep the architecture the focus.
 
 ## Run
 
