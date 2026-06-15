@@ -10,6 +10,13 @@ Stack: **Expo Router** (typed file-based routes) · **TypeScript** (strict) ·
 **Zustand** (client state) · **React Query** (server state) · a typed
 `ApiClient` with retry/timeout/error mapping · **Jest** unit tests.
 
+## Demo
+
+![Demo](screenshots/demo.gif)
+
+A walkthrough of every screen - sign in, task list with summary stats, task
+detail, the create-task modal, profile, and the shared error state.
+
 ## Screenshots
 
 | Sign in | Tasks list | Task detail |
