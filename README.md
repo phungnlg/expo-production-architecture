@@ -80,11 +80,21 @@ __tests__/                   mapper + client policy unit tests
 
 Data flow for one screen:
 
-```
-Screen -> useTasks() (React Query) -> TasksApi -> ApiClient -> fetch
-   ^                                     |
-   |          domain Task  <-- toTask() (DTO mapper)
-   render loading/empty/error/data
+```mermaid
+flowchart LR
+    Screen["Screen<br/><i>loading / empty / error / data</i>"]
+    Hook["useTasks()<br/><i>React Query</i>"]
+    Api["TasksApi"]
+    Client["ApiClient<br/><i>auth · retry · timeout</i>"]
+    Fetch["fetch"]
+    Mapper["toTask()<br/><i>DTO mapper</i>"]
+
+    Screen -->|render| Hook
+    Hook -->|request| Api
+    Api -->|HTTP| Client
+    Client --> Fetch
+    Fetch -->|TaskDTO| Mapper
+    Mapper -->|domain Task| Screen
 ```
 
 ### Why this scales
