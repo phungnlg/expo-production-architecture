@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TaskFlow - Create New Task</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-primary": "#adc6ff",
+                        "primary-fixed-dim": "#adc6ff",
+                        "tertiary": "#595c5e",
+                        "surface-variant": "#d8e3fb",
+                        "on-primary-fixed": "#001a42",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container": "#e7eeff",
+                        "secondary-fixed-dim": "#d0bcff",
+                        "primary-container": "#2170e4",
+                        "surface-container-highest": "#d8e3fb",
+                        "on-surface": "#111c2d",
+                        "error": "#ba1a1a",
+                        "primary-fixed": "#d8e2ff",
+                        "error-container": "#ffdad6",
+                        "on-background": "#111c2d",
+                        "on-secondary-fixed": "#23005c",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-fixed": "#191c1e",
+                        "on-secondary-fixed-variant": "#5516be",
+                        "on-surface-variant": "#424754",
+                        "surface-container-low": "#f0f3ff",
+                        "primary": "#0058be",
+                        "on-primary-fixed-variant": "#004395",
+                        "inverse-surface": "#263143",
+                        "tertiary-container": "#727577",
+                        "secondary": "#6b38d4",
+                        "tertiary-fixed-dim": "#c4c7c9",
+                        "on-tertiary-fixed-variant": "#444749",
+                        "on-secondary-container": "#fffbff",
+                        "outline-variant": "#c2c6d6",
+                        "surface-dim": "#cfdaf2",
+                        "on-error": "#ffffff",
+                        "surface-bright": "#f9f9ff",
+                        "on-secondary": "#ffffff",
+                        "background": "#f9f9ff",
+                        "secondary-container": "#8455ef",
+                        "on-tertiary-container": "#fbfdff",
+                        "on-primary-container": "#fefcff",
+                        "surface": "#f9f9ff",
+                        "on-primary": "#ffffff",
+                        "inverse-on-surface": "#ecf1ff",
+                        "on-error-container": "#93000a",
+                        "surface-tint": "#005ac2",
+                        "secondary-fixed": "#e9ddff",
+                        "outline": "#727785",
+                        "surface-container-high": "#dee8ff",
+                        "tertiary-fixed": "#e0e3e5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-margin": "24px",
+                        "stack-lg": "32px",
+                        "section-padding": "40px",
+                        "stack-sm": "8px",
+                        "stack-md": "16px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Inter"],
+                        "label-lg": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-md": ["12px", { "lineHeight": "1.2", "fontWeight": "500" }],
+                        "label-lg": ["14px", { "lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-sm": ["20px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        .shadow-level-1 {
+            box-shadow: 0px 15px 15px -3px rgba(17, 28, 45, 0.04);
+        }
+
+        .shadow-level-2 {
+            box-shadow: 0px 30px 30px -5px rgba(17, 28, 45, 0.08);
+        }
+
+        .primary-gradient {
+            background: linear-gradient(135deg, #0058be 0%, #6b38d4 100%);
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(0, 88, 190, 0.15);
+        }
+
+        .glass-nav {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col items-center justify-center">
+<!-- Task Creation Modal Wrapper (Desktop Centered) -->
+<main class="w-full max-w-md mx-auto h-screen sm:h-auto sm:max-h-[795px] bg-surface-container-lowest sm:rounded-3xl shadow-level-2 flex flex-col relative overflow-hidden">
+<!-- TopAppBar (Mapped from JSON logic) -->
+<header class="bg-background dark:bg-background flex justify-between items-center px-container-margin py-stack-md w-full z-10 sticky top-0">
+<button class="text-on-surface-variant hover:opacity-80 transition-opacity active:scale-95 duration-150">
+<span class="material-symbols-outlined">close</span>
+</button>
+<h1 class="text-headline-sm-mobile font-headline-sm-mobile text-on-surface font-bold">New Task</h1>
+<div class="w-6"></div> <!-- Spacer for symmetry -->
+</header>
+<!-- Modal Content Area -->
+<div class="flex-1 overflow-y-auto px-container-margin py-stack-lg space-y-stack-lg">
+<!-- Title Field -->
+<div class="space-y-stack-sm">
+<label class="text-label-lg font-label-lg text-on-surface-variant" for="task-title">Title</label>
+<input class="w-full bg-surface-container-lowest border border-outline-variant text-on-surface rounded-xl px-4 py-3 text-body-lg font-body-lg focus:border-primary transition-all duration-200" id="task-title" placeholder="What needs doing?" type="text"/>
+</div>
+<!-- Description Field -->
+<div class="space-y-stack-sm">
+<label class="text-label-lg font-label-lg text-on-surface-variant" for="task-desc">Description</label>
+<textarea class="w-full bg-surface-container-lowest border border-outline-variant text-on-surface rounded-xl px-4 py-3 text-body-md font-body-md focus:border-primary transition-all duration-200 resize-none" id="task-desc" placeholder="Add detail (optional)" rows="4"></textarea>
+</div>
+<!-- Priority Segmented Control -->
+<div class="space-y-stack-sm">
+<label class="text-label-lg font-label-lg text-on-surface-variant">Priority</label>
+<div class="flex bg-surface-container-low p-1.5 rounded-xl border border-outline-variant/30">
+<button class="flex-1 py-2 rounded-lg text-label-lg font-label-lg text-on-surface-variant hover:text-on-surface transition-all duration-200" id="p-low" onclick="setPriority('low')">
+                        Low
+                    </button>
+<button class="flex-1 py-2 rounded-lg text-label-lg font-label-lg bg-surface-container-lowest text-primary shadow-sm ring-1 ring-black/5 transition-all duration-200" id="p-medium" onclick="setPriority('medium')">
+                        Medium
+                    </button>
+<button class="flex-1 py-2 rounded-lg text-label-lg font-label-lg text-on-surface-variant hover:text-on-surface transition-all duration-200" id="p-high" onclick="setPriority('high')">
+                        High
+                    </button>
+</div>
+</div>
+<!-- Visual Context Card (Atmospheric Element) -->
+<div class="bg-surface-container-high rounded-2xl p-stack-md flex items-center space-x-gutter shadow-level-1 overflow-hidden relative">
+<div class="w-12 h-12 rounded-xl bg-primary-container/20 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary">calendar_today</span>
+</div>
+<div class="flex-1">
+<p class="text-label-lg font-label-lg text-on-surface">Set Due Date</p>
+<p class="text-label-md font-label-md text-on-surface-variant">Add a deadline for this task</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+<!-- Decorative subtle mesh background -->
+<div class="absolute -right-4 -bottom-4 opacity-5 pointer-events-none">
+<span class="material-symbols-outlined text-[80px]">task</span>
+</div>
+</div>
+<!-- Assignee Placeholder -->
+<div class="flex items-center space-x-gutter">
+<div class="flex -space-x-3 overflow-hidden">
+<img class="inline-block h-8 w-8 rounded-full ring-2 ring-surface-container-lowest bg-surface-container-high object-cover" data-alt="Close-up headshot of a smiling professional woman in a modern bright office with soft natural lighting, reflecting a corporate yet friendly environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMAWdYJI_OMzN5zweaEtNRKkLCZmQMzYr5qdDWUvhfaAzeROoDjygsEhnET6Ee1cvA_2tBPhnPpUocUBHRkUTjOzcKM3awZYx5LL9pirfSFPf6yf_0Xp-PRWxTqhr0zw4uq-9YEe7sAWFXPQabM5WYu_7BB3fImkIqH1UdWXKX_O1Pv6uN2jwyD6RBF2VKDaHB_eV15373apwYujLuKQVH-cOkKkioDHVetUtFCsw4zKwYqRFFXKQMAUzW3BNMhprCCDHIDR84SUJC"/>
+<img class="inline-block h-8 w-8 rounded-full ring-2 ring-surface-container-lowest bg-surface-container-high object-cover" data-alt="Close-up headshot of a focused creative male professional with light stubble in a clean minimalist design studio setting, soft daylight aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWnXzNj3U5SFkBRQSQQwNFeMIXt-opVji3tqA5fKHYt7DrJKqmsZ0FggsC16gAcw7S-VI-U2YCwx_EODztaeMYo2Zut_W1fYfj318IIEutL0dcgtiJdABM1B2w9T2Ep1-M6Rug6CcWFJP9EpxIDPTZojEJvuO2UcSyTnd8zewpCz_ZJnbqb4GCN5iy3ovuNew_hEuw9-PX7HJIwS0zYEAwD3RQH2Bs4WAoZqXKIro9OAXDcxXhu2wUqqyIWr9GmfctUJ9EMXmtQKtw"/>
+<div class="inline-block h-8 w-8 rounded-full ring-2 ring-surface-container-lowest bg-primary-container/10 flex items-center justify-center text-primary text-[10px] font-bold">+3</div>
+</div>
+<button class="text-primary font-label-lg text-label-lg flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">person_add</span>
+                    Assign collaborators
+                </button>
+</div>
+</div>
+<!-- Sticky Bottom Action (Prohibit suppression here as this is a focused task modal) -->
+<footer class="p-container-margin bg-surface-container-lowest/80 backdrop-blur-lg border-t border-outline-variant/20">
+<button class="w-full primary-gradient text-on-primary py-4 rounded-[16px] font-bold text-body-lg shadow-level-2 hover:opacity-90 active:scale-[0.98] transition-all duration-200">
+                Create task
+            </button>
+</footer>
+</main>
+<!-- BottomNavBar (Hidden on desktop, shown if this were a top level, but hidden for this task-focused view per guidelines) -->
+<!-- Suppressed to prioritize the modal focus -->
+<script>
+        function setPriority(level) {
+            const levels = ['low', 'medium', 'high'];
+            levels.forEach(l => {
+                const btn = document.getElementById(`p-${l}`);
+                if (l === level) {
+                    btn.classList.add('bg-surface-container-lowest', 'text-primary', 'shadow-sm', 'ring-1', 'ring-black/5');
+                    btn.classList.remove('text-on-surface-variant');
+                } else {
+                    btn.classList.remove('bg-surface-container-lowest', 'text-primary', 'shadow-sm', 'ring-1', 'ring-black/5');
+                    btn.classList.add('text-on-surface-variant');
+                }
+            });
+        }
+
+        // Simple animation on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const modal = document.querySelector('main');
+            modal.style.opacity = '0';
+            modal.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                modal.style.transition = 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
+                modal.style.opacity = '1';
+                modal.style.transform = 'translateY(0)';
+            }, 100);
+        });
+    </script>
+</body></html>
