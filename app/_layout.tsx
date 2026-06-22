@@ -59,11 +59,11 @@ function RootNavigator() {
         />
         <Stack.Screen
           name="new-task"
-          options={{ presentation: 'modal', title: 'New Task' }}
+          options={{ presentation: 'modal', headerShown: false }}
         />
         <Stack.Screen
           name="task/[id]"
-          options={{ title: 'Task', headerBackButtonDisplayMode: 'minimal' }}
+          options={{ headerShown: false }}
         />
       </Stack.Protected>
 
@@ -79,7 +79,7 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <QueryClientProvider client={queryClient}>
-          <StatusBar style="light" />
+          <StatusBar style="dark" />
           <RootNavigator />
         </QueryClientProvider>
       </SafeAreaProvider>

@@ -1,13 +1,16 @@
-import { Screen } from '@/components/Screen';
+import { Button } from '@/components/Button';
+import { NavBar, Screen } from '@/components/Screen';
 import { ErrorState, LoadingState } from '@/components/StateView';
+import { useTask } from '@/features/tasks/hooks';
 import {
   PRIORITY_LABEL,
   STATUS_LABEL,
+  Task,
 } from '@/features/tasks/model';
-import { useTask } from '@/features/tasks/hooks';
-import { colors, radius, spacing, typography } from '@/theme/tokens';
-import { useLocalSearchParams } from 'expo-router';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { colors, radius, shadow, spacing, typography } from '@/theme/tokens';
+import { MaterialIcons } from '@expo/vector-icons';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 /**
  * Task detail. Reads the typed route param, fetches via React Query (served
@@ -16,92 +19,207 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
  */
 export default function TaskDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const router = useRouter();
   const { data: task, isPending, error, refetch } = useTask(id);
 
   if (isPending) return <LoadingState label="Loading task..." />;
   if (error) return <ErrorState error={error} onRetry={refetch} />;
 
   return (
-    <Screen>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <Text style={styles.title}>{task.title}</Text>
+    <Screen
+      header={
+        <NavBar
+          onLeading={() => router.back()}
+          title="Task Detail"
+          right={
+            <Pressable style={styles.editBtn}>
+              <Text style={styles.editText}>Edit</Text>
+            </Pressable>
+          }
+        />
+      }
+    >
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: spacing.xxl }}
+      >
         <View style={styles.metaRow}>
-          <Pill label={STATUS_LABEL[task.status]} />
-          <Pill label={`${PRIORITY_LABEL[task.priority]} priority`} />
+          <Pill
+            label={STATUS_LABEL[task.status]}
+            bg={colors.surfaceHigh}
+            fg={colors.primary}
+            dot={colors.primary}
+          />
+          <Pill
+            label={`${PRIORITY_LABEL[task.priority]} priority`}
+            bg={colors.dangerSurface}
+            fg={colors.onDangerSurface}
+            dot={colors.danger}
+          />
         </View>
 
-        <Section heading="Description">
+        <Text style={styles.title}>{task.title}</Text>
+        <Text style={styles.crumb}>
+          Task ID: {task.id} - {task.assignee}
+        </Text>
+
+        <Card>
+          <Label>Description</Label>
           <Text style={styles.body}>
             {task.description || 'No description provided.'}
           </Text>
-        </Section>
+        </Card>
 
-        <Section heading="Details">
+        <View style={styles.detailCard}>
+          <Label>Task Details</Label>
           <Detail label="Assignee" value={task.assignee} />
           <Detail label="Created" value={task.createdAt.toDateString()} />
           <Detail
-            label="Due"
+            label="Due Date"
             value={task.dueAt ? task.dueAt.toDateString() : 'No due date'}
+            valueColor={colors.primary}
           />
-          <Detail label="ID" value={task.id} />
-        </Section>
+          <Detail
+            label="Priority"
+            value={PRIORITY_LABEL[task.priority]}
+            valueColor={colors.danger}
+            last
+          />
+          <Button
+            label="Complete Task"
+            onPress={() => {}}
+            style={{ marginTop: spacing.lg }}
+          />
+        </View>
+
+        <View style={styles.history}>
+          <MaterialIcons name="history" size={30} color={colors.outline} />
+          <Text style={styles.historyText}>Activity History</Text>
+          <Text style={styles.historyLink}>View timeline</Text>
+        </View>
       </ScrollView>
     </Screen>
   );
 }
 
-function Section({
-  heading,
-  children,
+function Card({ children }: { children: React.ReactNode }) {
+  return <View style={styles.card}>{children}</View>;
+}
+
+function Label({ children }: { children: React.ReactNode }) {
+  return <Text style={styles.cardLabel}>{children}</Text>;
+}
+
+function Detail({
+  label,
+  value,
+  valueColor,
+  last,
 }: {
-  heading: string;
-  children: React.ReactNode;
+  label: string;
+  value: string;
+  valueColor?: string;
+  last?: boolean;
 }) {
   return (
-    <View style={styles.section}>
-      <Text style={styles.sectionHeading}>{heading}</Text>
-      {children}
-    </View>
-  );
-}
-
-function Detail({ label, value }: { label: string; value: string }) {
-  return (
-    <View style={styles.detailRow}>
+    <View style={[styles.detailRow, last && styles.detailRowLast]}>
       <Text style={styles.detailLabel}>{label}</Text>
-      <Text style={styles.detailValue}>{value}</Text>
+      <Text style={[styles.detailValue, valueColor ? { color: valueColor } : null]}>
+        {value}
+      </Text>
     </View>
   );
 }
 
-function Pill({ label }: { label: string }) {
+function Pill({
+  label,
+  bg,
+  fg,
+  dot,
+}: {
+  label: string;
+  bg: string;
+  fg: string;
+  dot: string;
+}) {
   return (
-    <View style={styles.pill}>
-      <Text style={styles.pillText}>{label}</Text>
+    <View style={[styles.pill, { backgroundColor: bg }]}>
+      <View style={[styles.pillDot, { backgroundColor: dot }]} />
+      <Text style={[styles.pillText, { color: fg }]}>{label}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  title: { ...typography.title, marginTop: spacing.sm },
+  editBtn: {
+    backgroundColor: colors.surfaceAlt,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.md,
+  },
+  editText: { color: colors.primary, fontWeight: '600', fontSize: 14 },
   metaRow: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.md },
   pill: {
-    backgroundColor: colors.surfaceAlt,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
     borderRadius: radius.pill,
     paddingHorizontal: spacing.md,
-    paddingVertical: 4,
+    paddingVertical: 5,
   },
-  pillText: { color: colors.text, fontSize: 12, fontWeight: '700' },
-  section: { marginTop: spacing.xl },
-  sectionHeading: { ...typography.label, marginBottom: spacing.sm },
-  body: { ...typography.body, lineHeight: 22 },
+  pillDot: { width: 6, height: 6, borderRadius: 3 },
+  pillText: { fontSize: 12, fontWeight: '600' },
+  title: { ...typography.display, marginTop: spacing.md },
+  crumb: { ...typography.bodySm, color: colors.textMuted, marginTop: spacing.sm },
+  card: {
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    padding: spacing.xl,
+    marginTop: spacing.xl,
+    ...shadow.card,
+  },
+  cardLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: colors.outline,
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
+    marginBottom: spacing.md,
+  },
+  body: { ...typography.body, color: colors.textMuted, lineHeight: 24 },
+  detailCard: {
+    backgroundColor: colors.surfaceAlt,
+    borderRadius: radius.lg,
+    padding: spacing.xl,
+    marginTop: spacing.lg,
+    borderWidth: 1,
+    borderColor: 'rgba(194,198,214,0.25)',
+  },
   detailRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: spacing.sm,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.border,
+    alignItems: 'center',
+    paddingVertical: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(194,198,214,0.2)',
   },
-  detailLabel: { ...typography.body, color: colors.textMuted },
-  detailValue: { ...typography.body, fontWeight: '600' },
+  detailRowLast: { borderBottomWidth: 0 },
+  detailLabel: { ...typography.bodySm, color: colors.textMuted },
+  detailValue: { fontSize: 14, fontWeight: '600', color: colors.text },
+  history: {
+    marginTop: spacing.lg,
+    padding: spacing.xl,
+    borderRadius: radius.lg,
+    borderWidth: 2,
+    borderColor: 'rgba(194,198,214,0.4)',
+    borderStyle: 'dashed',
+    alignItems: 'center',
+  },
+  historyText: { ...typography.caption, marginTop: spacing.sm },
+  historyLink: {
+    color: colors.primary,
+    fontSize: 12,
+    fontWeight: '600',
+    marginTop: 4,
+  },
 });

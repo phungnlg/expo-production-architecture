@@ -1,11 +1,19 @@
 import { Button } from '@/components/Button';
-import { Screen } from '@/components/Screen';
+import { BrandLogo } from '@/components/Screen';
 import { TextField } from '@/components/TextField';
 import { useSignIn } from '@/features/auth/hooks';
 import { AppError, messageFor } from '@/lib/result';
-import { colors, spacing, typography } from '@/theme/tokens';
+import { colors, gradient, radius, screenPadding, shadow, spacing, typography } from '@/theme/tokens';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, StyleSheet, Text, View } from 'react-native';
+import {
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 /**
  * Sign-in screen. Pre-filled demo credentials so the flow is one tap on a
@@ -19,71 +27,115 @@ export default function SignIn() {
   const error = signIn.error as AppError | null;
 
   return (
-    <Screen>
+    <SafeAreaView style={styles.safe}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.flex}
       >
-        <View style={styles.flex}>
+        <View style={styles.content}>
           <View style={styles.brand}>
-            <View style={styles.logo}>
-              <Text style={styles.logoMark}>◆</Text>
-            </View>
+            <LinearGradient
+              colors={[...gradient]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.logo}
+            >
+              <BrandGlyph />
+            </LinearGradient>
             <Text style={styles.title}>TaskFlow</Text>
-            <Text style={styles.subtitle}>
-              Reference React Native architecture
-            </Text>
+            <Text style={styles.subtitle}>Reference React Native architecture</Text>
           </View>
 
-          <TextField
-            label="Email"
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            keyboardType="email-address"
-            placeholder="you@studio.app"
-          />
-          <TextField
-            label="Password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            placeholder="••••••••"
-            error={error ? messageFor(error) : undefined}
-          />
+          <View style={styles.card}>
+            <TextField
+              label="Email"
+              icon="mail-outline"
+              value={email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+              keyboardType="email-address"
+              placeholder="Enter your email"
+            />
+            <TextField
+              label="Password"
+              icon="lock-outline"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              placeholder="********"
+              error={error ? messageFor(error) : undefined}
+            />
 
-          <Button
-            label="Sign in"
-            loading={signIn.isPending}
-            onPress={() => signIn.mutate({ email, password })}
-          />
-          <Text style={styles.hint}>
-            Demo credentials are pre-filled. Tap Sign in.
-          </Text>
+            <Button
+              label="Sign in"
+              iconRight="arrow-forward"
+              loading={signIn.isPending}
+              onPress={() => signIn.mutate({ email, password })}
+            />
+
+            <View style={styles.hintRow}>
+              <View style={styles.pulse} />
+              <Text style={styles.hint}>Demo credentials are pre-filled. Tap Sign in.</Text>
+            </View>
+          </View>
         </View>
       </KeyboardAvoidingView>
-    </Screen>
+    </SafeAreaView>
+  );
+}
+
+/** A four-cell grid glyph echoing the Material grid_view mark, in white. */
+function BrandGlyph() {
+  return (
+    <View style={styles.glyph}>
+      {[0, 1, 2, 3].map((i) => (
+        <View key={i} style={styles.glyphCell} />
+      ))}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1, justifyContent: 'center' },
+  safe: { flex: 1, backgroundColor: colors.bg },
+  flex: { flex: 1 },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: screenPadding,
+  },
   brand: { alignItems: 'center', marginBottom: spacing.xxl },
   logo: {
-    width: 64,
-    height: 64,
-    borderRadius: 18,
-    backgroundColor: colors.primary,
+    width: 76,
+    height: 76,
+    borderRadius: radius.xl,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: spacing.md,
+    marginBottom: spacing.lg,
+    transform: [{ rotate: '12deg' }],
+    ...shadow.raised,
   },
-  logoMark: { color: colors.primaryText, fontSize: 30, fontWeight: '800' },
-  title: { ...typography.title, fontSize: 30 },
-  subtitle: { ...typography.body, color: colors.textMuted, marginTop: 4 },
-  hint: {
-    ...typography.caption,
-    textAlign: 'center',
+  glyph: { width: 34, height: 34, flexDirection: 'row', flexWrap: 'wrap', gap: 4 },
+  glyphCell: {
+    width: 15,
+    height: 15,
+    borderRadius: 4,
+    backgroundColor: colors.primaryText,
+  },
+  title: { ...typography.display, marginBottom: 4 },
+  subtitle: { ...typography.label, color: colors.textMuted, opacity: 0.7 },
+  card: {
+    backgroundColor: colors.surface,
+    borderRadius: radius.xl,
+    padding: spacing.xl,
+    ...shadow.card,
+  },
+  hintRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
     marginTop: spacing.lg,
   },
+  pulse: { width: 6, height: 6, borderRadius: 3, backgroundColor: colors.secondary },
+  hint: { ...typography.caption, fontStyle: 'italic' },
 });

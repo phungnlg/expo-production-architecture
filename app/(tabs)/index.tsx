@@ -1,5 +1,4 @@
-import { Button } from '@/components/Button';
-import { Screen } from '@/components/Screen';
+import { Screen, NewButton } from '@/components/Screen';
 import {
   EmptyState,
   ErrorState,
@@ -8,7 +7,7 @@ import {
 import { TaskCard } from '@/components/TaskCard';
 import { countByStatus } from '@/features/tasks/model';
 import { useTasks } from '@/features/tasks/hooks';
-import { colors, radius, spacing, typography } from '@/theme/tokens';
+import { colors, radius, shadow, spacing } from '@/theme/tokens';
 import { useRouter } from 'expo-router';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 
@@ -25,22 +24,16 @@ export default function TasksScreen() {
 
   return (
     <Screen
+      brand
       title="Tasks"
       subtitle="Team backlog"
-      right={
-        <Button
-          label="+ New"
-          variant="secondary"
-          onPress={() => router.push('/new-task')}
-          style={{ height: 40, paddingHorizontal: spacing.md }}
-        />
-      }
+      right={<NewButton onPress={() => router.push('/new-task')} />}
     >
       {counts ? (
         <View style={styles.summary}>
-          <Stat label="To do" value={counts.todo} />
-          <Stat label="In progress" value={counts.in_progress} />
-          <Stat label="Done" value={counts.done} />
+          <Stat label="To do" value={counts.todo} color={colors.primary} />
+          <Stat label="In progress" value={counts.in_progress} color={colors.secondary} />
+          <Stat label="Done" value={counts.done} color={colors.textMuted} />
         </View>
       ) : null}
 
@@ -64,7 +57,7 @@ export default function TasksScreen() {
             />
           )}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: spacing.xxl }}
+          contentContainerStyle={{ paddingBottom: spacing.xl }}
           onRefresh={refetch}
           refreshing={isRefetching}
         />
@@ -73,10 +66,18 @@ export default function TasksScreen() {
   );
 }
 
-function Stat({ label, value }: { label: string; value: number }) {
+function Stat({
+  label,
+  value,
+  color,
+}: {
+  label: string;
+  value: number;
+  color: string;
+}) {
   return (
     <View style={styles.stat}>
-      <Text style={styles.statValue}>{value}</Text>
+      <Text style={[styles.statValue, { color }]}>{value}</Text>
       <Text style={styles.statLabel}>{label}</Text>
     </View>
   );
@@ -86,17 +87,23 @@ const styles = StyleSheet.create({
   summary: {
     flexDirection: 'row',
     gap: spacing.md,
-    marginBottom: spacing.lg,
+    marginBottom: spacing.xl,
   },
   stat: {
     flex: 1,
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    paddingVertical: spacing.md,
+    backgroundColor: colors.surfaceAlt,
+    borderRadius: radius.lg,
+    paddingVertical: spacing.lg,
     alignItems: 'center',
+    ...shadow.card,
   },
-  statValue: { fontSize: 22, fontWeight: '800', color: colors.text },
-  statLabel: { ...typography.caption, marginTop: 2 },
+  statValue: { fontSize: 24, fontWeight: '700' },
+  statLabel: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: colors.textMuted,
+    marginTop: 4,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
 });
